@@ -54,7 +54,7 @@ function reservarAsiento(sala: number[][], fila: number, columna: number): strin
     return "Error: la posición fila " + fila + ", columna " + columna + " no existe en la sala.";
   }
   if (sala[fila][columna] === 1) {
-    return "Sillas ya vendidas";
+    return "Silla ya reservada";
   }
   sala[fila][columna] = 1;
   return "Éxito: asiento fila " + fila + ", columna " + columna + " reservado.";
@@ -95,6 +95,39 @@ function mostrarParejaLibre(resultado: number[] | null): void {
   } else {
     console.log("Par libre encontrado: fila " + resultado[0] + ", columnas " + resultado[1] + " y " + (resultado[1] + 1) + ".");
   }
+}
+
+/**
+ * Devuelve un arreglo con `cantidad` posiciones de asientos libres aleatorios.
+ * Si hay menos libres que `cantidad`, devuelve todos los que haya.
+ * Usa el algoritmo Fisher-Yates para mezclar.
+ */
+function obtenerSugerencias(sala: number[][], cantidad: number): number[][] {
+  // Recolectar todas las posiciones libres
+  const libres: number[][] = [];
+  for (let i = 0; i < sala.length; i++) {
+    for (let j = 0; j < sala[i].length; j++) {
+      if (sala[i][j] === 0) {
+        libres.push([i, j]);
+      }
+    }
+  }
+
+  // Mezclar aleatoriamente (Fisher-Yates)
+  for (let k = libres.length - 1; k > 0; k--) {
+    const aleatorio = Math.floor(Math.random() * (k + 1));
+    const temp = libres[k];
+    libres[k] = libres[aleatorio];
+    libres[aleatorio] = temp;
+  }
+
+  // Devolver las primeras `cantidad` (o todas si hay menos)
+  const max = cantidad < libres.length ? cantidad : libres.length;
+  const resultado: number[][] = [];
+  for (let i = 0; i < max; i++) {
+    resultado.push(libres[i]);
+  }
+  return resultado;
 }
 
 // --------------------------------------------------------------------------
@@ -155,13 +188,13 @@ if (typeof document !== "undefined") {
         if (esPareja) {
           clases += "bg-orange-400 border-orange-300 text-orange-900 hover:bg-orange-500 ";
         } else if (ocupado) {
-          clases += "bg-rose-400 border-rose-300 text-white cursor-not-allowed ";
+          clases += "bg-rose-400 border-rose-300 text-white cursor-pointer hover:bg-rose-300 ";
         } else {
           clases += "bg-emerald-500 border-emerald-400 text-emerald-900 hover:bg-emerald-400 hover:scale-105 ";
         }
 
         const label = ocupado ? "X" : "L";
-        const onClick = ocupado ? "" : "onclick='reservarClick(" + fila + "," + col + ")'";
+        const onClick = "onclick='reservarClick(" + fila + "," + col + ")'";
 
         html += '<td class="p-0.5"><div class="' + clases + '" ' + onClick + ' data-fila="' + fila + '" data-col="' + col + '">' + label + "</div></td>";
       }
@@ -185,8 +218,35 @@ if (typeof document !== "undefined") {
     const exito = resultado.startsWith("Éxito");
     mostrarMensaje(resultado, exito);
 
-    // También mostrar en consola
     console.log(resultado);
+
+    // Limpiar sugerencias anteriores
+    const sugerenciasEl = document.getElementById("sugerencias")!;
+    sugerenciasEl.innerHTML = "";
+
+    // Si la silla ya estaba reservada, mostrar sugerencias
+    if (resultado === "Silla ya reservada") {
+      const sugerencias = obtenerSugerencias(sala, 3);
+
+      if (sugerencias.length === 0) {
+        sugerenciasEl.innerHTML =
+          '<div class="text-center text-red-300 text-sm">No hay asientos disponibles para sugerir.</div>';
+      } else {
+        let html = '<div class="text-center mt-2">';
+        html += '<p class="text-sm text-slate-300 mb-2">💡 Alternativas disponibles:</p>';
+        html += '<div class="flex justify-center gap-3 flex-wrap">';
+        for (let i = 0; i < sugerencias.length; i++) {
+          const s = sugerencias[i];
+          html +=
+            '<button onclick="reservarClick(' + s[0] + ',' + s[1] + ')"' +
+            ' class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-md">' +
+            'Fila ' + s[0] + ', Col ' + s[1] +
+            '</button>';
+        }
+        html += '</div></div>';
+        sugerenciasEl.innerHTML = html;
+      }
+    }
 
     // Re-renderizar
     renderizarSala();
@@ -203,12 +263,12 @@ if (typeof document !== "undefined") {
       mostrarMensaje(texto, true);
       console.log(texto);
     }
+    document.getElementById("sugerencias")!.innerHTML = "";
     renderizarSala();
   });
 
   // ---------- Botón: reiniciar sala ----------
   btnReiniciar.addEventListener("click", () => {
-    // Vaciar la sala
     for (let i = 0; i < sala.length; i++) {
       for (let j = 0; j < sala[i].length; j++) {
         sala[i][j] = 0;
@@ -216,6 +276,7 @@ if (typeof document !== "undefined") {
     }
     mostrarMensaje("Sala reiniciada. Todos los asientos están libres.", true);
     console.log("Sala reiniciada.");
+    document.getElementById("sugerencias")!.innerHTML = "";
     renderizarSala();
   });
 
@@ -255,6 +316,11 @@ if (typeof document === "undefined") {
 
   console.log("Intento de reservar un asiento ya ocupado:");
   console.log(reservarAsiento(sala, 0, 0));
+  const sugConsola = obtenerSugerencias(sala, 3);
+  console.log("  💡 Alternativas disponibles:");
+  for (let i = 0; i < sugConsola.length; i++) {
+    console.log("     " + (i + 1) + ". Fila " + sugConsola[i][0] + ", Columna " + sugConsola[i][1]);
+  }
   console.log();
 
   console.log("Intento de reservar una posición inexistente:");
