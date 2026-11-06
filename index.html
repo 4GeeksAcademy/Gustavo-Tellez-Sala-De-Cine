@@ -1,25 +1,57 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello World with Typescript</title>
+    <title>Sala de Cine - Reserva de Asientos</title>
   </head>
-  <body class="min-h-screen bg-slate-100 text-slate-900">
-    <main class="mx-auto flex min-h-screen max-w-2xl flex-col items-center justify-center gap-6 p-6">
-      <h1 class="text-4xl font-bold tracking-tight">Hello World with Typescript</h1>
+  <body class="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+    <main class="mx-auto max-w-4xl px-4 py-8">
+      <!-- Título -->
+      <h1 class="text-center text-3xl font-bold mb-1">🎬 Sala de Cine</h1>
+      <p class="text-center text-slate-400 mb-8">Haz clic en un asiento disponible para reservarlo</p>
 
-      <section class="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <img
-          src="/rigo-baby.jpg"
-          alt="Hello Rigo"
-          class="h-64 w-full bg-slate-50 object-contain p-2"
-        />
-        <div class="p-5">
-          <h2 class="text-xl font-semibold text-slate-900">Hello Rigo</h2>
-          <p id="app" class="mt-2 text-sm text-slate-600"></p>
+      <!-- Pantalla -->
+      <div class="flex justify-center mb-10">
+        <div class="w-3/4 h-16 bg-gradient-to-b from-slate-500 to-slate-600 rounded-t-full flex items-center justify-center text-slate-300 font-semibold tracking-[0.3em] text-lg shadow-lg select-none">
+          SCREEN
         </div>
-      </section>
+      </div>
+
+      <!-- Mapa de asientos -->
+      <div id="seat-map" class="flex justify-center mb-6 overflow-x-auto"></div>
+
+      <!-- Estadísticas -->
+      <div id="stats" class="flex justify-center gap-8 mb-6 text-sm text-slate-300"></div>
+
+      <!-- Botones de acción -->
+      <div class="flex justify-center gap-4 mb-6">
+        <button id="btn-pareja" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-md">
+          🔍 Buscar pareja libre
+        </button>
+        <button id="btn-reiniciar" class="bg-slate-600 hover:bg-slate-500 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-md">
+          🔄 Reiniciar sala
+        </button>
+      </div>
+
+      <!-- Mensaje de estado -->
+      <div id="mensaje" class="text-center text-sm min-h-[2rem] text-slate-300 mb-6"></div>
+
+      <!-- Leyenda -->
+      <div class="flex justify-center gap-6 text-sm">
+        <div class="flex items-center gap-2">
+          <div class="w-5 h-5 rounded bg-emerald-500 border border-emerald-400"></div>
+          <span class="text-slate-300">Disponible</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-5 h-5 rounded bg-rose-400 border border-rose-300"></div>
+          <span class="text-slate-300">Ocupado</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-5 h-5 rounded bg-orange-400 border border-orange-300"></div>
+          <span class="text-slate-300">Pareja libre</span>
+        </div>
+      </div>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
